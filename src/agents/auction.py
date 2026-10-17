@@ -29,7 +29,8 @@ Reglas:
 - El título tiene entre 10 y 80 caracteres.
 - La descripción tiene entre 50 y 1000 caracteres.
 - No menciones el precio: el sistema lo agrega aparte.
-- Escribí en español rioplatense.
+- Escribí en español rioplatense, como si fueras el vendedor publicando su producto.
+- No menciones "los datos", "el sistema" ni nada del funcionamiento interno: el comprador no lo ve.
 
 Si te pasan un borrador anterior con problemas, corregí esos problemas manteniendo lo que estaba bien."""
 

@@ -10,6 +10,7 @@ class State(TypedDict, total=False):
 
     # Entrada
     message: str  # mensaje del usuario
+    history: list[dict]  # mensajes anteriores: [{"role": "user" | "assistant", "content": str}]
 
     # Los escribe el Coordinador
     intent: str  # create_auction_no_price, create_auction_with_price, price_query, missing_info, off_topic

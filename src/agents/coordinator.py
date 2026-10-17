@@ -1,6 +1,6 @@
 from typing import Literal
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from llm import llm
@@ -37,8 +37,8 @@ class CoordinatorOutput(BaseModel):
         "(ej. '500 lucas' -> 500000). Si no dice un precio, null."
     )
     response: str | None = Field(
-        description="Solo en missing_info y off_topic: respuesta breve y amable para el usuario. Si es off_topic, indicar " \
-        "solo respondés a cuestiones de subastas."
+        description="Solo en missing_info y off_topic: respuesta breve y amable para el usuario. "
+        "Si es off_topic, indicar que solo respondés a cuestiones de subastas. "
         "En el resto de los casos, null."
     )
 
@@ -53,14 +53,24 @@ Clasificá el mensaje en una de estas intenciones:
 - missing_info: quiere subastar algo pero no dice qué producto.
 - off_topic: el mensaje no tiene que ver con subastas ni con precios.
 
+Puede haber mensajes anteriores de la conversación. Usalos para completar lo que el usuario ya dijo
+(qué quiere hacer, el producto, el precio): si antes dijo que quería subastar y ahora da los datos
+del producto, la intención sigue siendo subastar.
+
 Nunca inventes datos que el usuario no dio."""
 
 structured_llm = llm.with_structured_output(CoordinatorOutput)
 
 
 def coordinator(state: State) -> dict:
+    history = [
+        HumanMessage(content=m["content"]) if m["role"] == "user" else AIMessage(content=m["content"])
+        for m in state.get("history", [])
+    ]
+
     result = structured_llm.invoke([
         SystemMessage(content=SYSTEM_PROMPT),
+        *history,
         HumanMessage(content=state["message"]),
     ])
 
