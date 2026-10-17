@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from llm import llm
+from state import State
 from tools import price_stats, search_similar
 
 MIN_COMPARABLES = 2
@@ -45,7 +46,7 @@ def format_price(price):
     return f"${price:,}".replace(",", ".")
 
 
-def analyst(state):
+def analyst(state: State) -> dict:
     product = state["product"]
     user_price = state.get("user_price")
 

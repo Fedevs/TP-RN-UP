@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from agents.coordinator import Category
 from llm import llm
+from state import State
 
 VALID_CATEGORIES = get_args(Category)
 REQUIRED_FIELDS = ["title", "description", "category", "starting_price", "duration_days"]
@@ -59,7 +60,7 @@ def check_rules(draft):
     return issues
 
 
-def validator(state):
+def validator(state: State) -> dict:
     draft = state["draft"]
 
     issues = check_rules(draft)

@@ -218,3 +218,28 @@ flowchart TD
 - **Hay 3 puntos de decisión (routers):** después del Coordinador (según la intención), después del Analista (según la intención y si hay datos) y después del Validador (según si se aprobó y cuántos reintentos van).
 - **IA donde aporta, código donde hace falta exactitud:** clasificar, interpretar y redactar → LLM. Buscar, calcular precios y verificar reglas objetivas → Python.
 - **Máximo 3 intentos de Subastas** (1 original + 2 correcciones) para no quedar en un bucle infinito.
+
+### Diagrama generado por LangGraph
+
+Este diagrama no está dibujado a mano: lo genera LangGraph a partir del código de `src/graph.py` (`python graph.py` desde `src`). Coincide con el diseño de arriba, lo que muestra que la implementación respeta la arquitectura.
+
+```mermaid
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	coordinator(coordinator)
+	analyst(analyst)
+	auction(auction)
+	validator(validator)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> coordinator;
+	analyst -.-> __end__;
+	analyst -.-> auction;
+	auction --> validator;
+	coordinator -.-> __end__;
+	coordinator -.-> analyst;
+	validator -.-> __end__;
+	validator -.-> auction;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+```

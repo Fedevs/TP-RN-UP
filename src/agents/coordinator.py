@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from llm import llm
+from state import State
 
 Intent = Literal[
     "create_auction_no_price",
@@ -57,7 +58,7 @@ Nunca inventes datos que el usuario no dio."""
 structured_llm = llm.with_structured_output(CoordinatorOutput)
 
 
-def coordinator(state):
+def coordinator(state: State) -> dict:
     result = structured_llm.invoke([
         SystemMessage(content=SYSTEM_PROMPT),
         HumanMessage(content=state["message"]),

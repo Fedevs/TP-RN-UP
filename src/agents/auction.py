@@ -5,6 +5,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from llm import llm
+from state import State
 
 DEFAULT_DURATION_DAYS = 7
 
@@ -46,7 +47,7 @@ def choose_starting_price(state):
     raise ValueError("Auction agent needs a price: neither user_price nor suggested_price is set")
 
 
-def auction(state):
+def auction(state: State) -> dict:
     product = state["product"]
     starting_price = choose_starting_price(state)
 
