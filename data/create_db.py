@@ -1,31 +1,30 @@
-"""Creates the SQLite database with finished auctions used as price references.
+"""Crea la base de datos SQLite con subastas finalizadas que sirven como referencia de precios.
 
-The Analyst agent uses this data to estimate prices by comparing similar products.
-Products and prices are fictional (in Argentine pesos), made up for this project.
-Names and descriptions are in Spanish because they are listings from the Argentine market.
+El Analista usa estos datos para estimar precios comparando productos similares.
+Los productos y precios son ficticios (en pesos argentinos), armados solo para el TP.
 
-Usage:
+Uso:
     python data/create_db.py
 
-If the database already exists, it is deleted and created again from scratch.
+Si la base ya existe, la borra y la vuelve a crear desde cero.
 """
 
 import sqlite3
 from pathlib import Path
 
-# The database is created next to this script, no matter where it is run from.
+# La base se crea en la misma carpeta que este script, sin importar desde dónde se ejecute.
 DB_PATH = Path(__file__).parent / "products.db"
 
-# "other" has no products loaded: it is the category for anything that doesn't fit
-# the rest (e.g. a board game). The Analyst won't find similar products and the flow
-# follows the "no data" path defined in docs/diagrama.md.
+# "other" no tiene productos cargados: es la categoría para lo que no encaja en ninguna
+# de las demás (ej. un juego de mesa). El Analista no va a encontrar similares y el flujo
+# sigue el camino de "sin datos" definido en docs/diagrama.md.
 CATEGORIES = ["consoles", "phones", "laptops", "tvs", "bicycles", "other"]
 
 CONDITIONS = ["new", "used", "refurbished"]
 
-# Each tuple is a row: (name, category, description, condition, final_price, date)
+# Cada tupla es una fila: (name, category, description, condition, final_price, date)
 PRODUCTS = [
-    # Consoles
+    # Consolas
     ("PlayStation 5 Standard", "consoles", "Incluye 1 joystick. Funciona perfecto.", "used", 420000, "2026-08-14"),
     ("PlayStation 5 Standard", "consoles", "Con caja original y todos los cables.", "used", 480000, "2026-09-02"),
     ("PlayStation 5 Standard", "consoles", "Incluye 2 joysticks y 3 juegos físicos.", "used", 520000, "2026-09-20"),
@@ -36,7 +35,7 @@ PRODUCTS = [
     ("Nintendo Switch OLED", "consoles", "Sellada en caja.", "new", 480000, "2026-10-01"),
     ("Nintendo Switch Lite", "consoles", "Color turquesa, con cargador.", "used", 190000, "2026-08-03"),
     ("Xbox Series S", "consoles", "512 GB, 1 joystick.", "used", 290000, "2026-09-25"),
-    # Phones
+    # Celulares
     ("iPhone 13 128GB", "phones", "Batería al 88%. Con funda.", "used", 550000, "2026-09-08"),
     ("iPhone 13 128GB", "phones", "Batería al 82%, pantalla sin marcas.", "used", 500000, "2026-08-19"),
     ("iPhone 14 128GB", "phones", "Batería al 91%. Con caja.", "used", 700000, "2026-09-29"),
@@ -45,7 +44,7 @@ PRODUCTS = [
     ("Samsung Galaxy A54 128GB", "phones", "Sellado, con garantía oficial.", "new", 420000, "2026-09-15"),
     ("Motorola Moto G84 256GB", "phones", "Funciona perfecto, con funda y vidrio templado.", "used", 200000, "2026-10-03"),
     ("Xiaomi Redmi Note 13 256GB", "phones", "Sellado en caja.", "new", 300000, "2026-09-18"),
-    # Laptops
+    # Notebooks
     ("MacBook Air M1 8GB 256GB", "laptops", "Ciclos de batería: 210. Con cargador original.", "used", 750000, "2026-09-10"),
     ("MacBook Air M1 8GB 256GB", "laptops", "Tiene un golpe en una esquina, funciona perfecto.", "used", 700000, "2026-08-08"),
     ("MacBook Air M2 8GB 256GB", "laptops", "Como nueva, con caja.", "used", 1000000, "2026-09-27"),
@@ -54,7 +53,7 @@ PRODUCTS = [
     ("HP 15 i3 8GB", "laptops", "SSD 256 GB. Batería dura unas 3 horas.", "used", 320000, "2026-07-28"),
     ("Dell Inspiron 15 i7 16GB", "laptops", "SSD 512 GB, ideal para trabajo.", "used", 650000, "2026-09-05"),
     ("Asus TUF Gaming F15 RTX 3050", "laptops", "i5 16 GB, SSD 512 GB. Para juegos.", "used", 900000, "2026-10-07"),
-    # TVs
+    # Televisores
     ("Samsung 50 pulgadas 4K Crystal UHD", "tvs", "Smart TV con control remoto original.", "used", 350000, "2026-08-16"),
     ("Samsung 55 pulgadas 4K Crystal UHD", "tvs", "Smart TV, sin pie (se usaba colgado).", "used", 420000, "2026-09-12"),
     ("LG 43 pulgadas Full HD", "tvs", "Smart TV webOS.", "used", 230000, "2026-07-25"),
@@ -62,7 +61,7 @@ PRODUCTS = [
     ("TCL 50 pulgadas 4K Google TV", "tvs", "Sellado en caja.", "new", 450000, "2026-10-02"),
     ("Philips 32 pulgadas HD", "tvs", "Smart TV, ideal para dormitorio.", "used", 140000, "2026-08-11"),
     ("Noblex 43 pulgadas Full HD", "tvs", "Smart TV Android, con control remoto.", "used", 180000, "2026-09-03"),
-    # Bicycles
+    # Bicicletas
     ("Mountain bike Venzo Raptor rodado 29", "bicycles", "Cambios Shimano 21 velocidades, frenos a disco.", "used", 420000, "2026-09-14"),
     ("Mountain bike Venzo Loki rodado 29", "bicycles", "Frenos a disco mecánicos, cubiertas nuevas.", "used", 380000, "2026-08-24"),
     ("Mountain bike Topmega rodado 29", "bicycles", "Cuadro de aluminio, 21 velocidades.", "used", 250000, "2026-07-19"),
@@ -77,12 +76,12 @@ def create_db():
     connection = sqlite3.connect(DB_PATH)
     cursor = connection.cursor()
 
-    # Start from scratch every time, so everyone in the group has the same database.
+    # Empezamos desde cero cada vez, así todos en el grupo tienen la misma base.
     cursor.execute("DROP TABLE IF EXISTS products")
 
-    # CHECK makes SQLite reject invalid rows (e.g. a negative price).
-    # The price is an INTEGER (whole pesos) and not REAL, to avoid rounding errors.
-    # The date is TEXT in YYYY-MM-DD format: that way it can be sorted and compared as text.
+    # CHECK hace que SQLite rechace filas inválidas (ej. un precio negativo).
+    # El precio es INTEGER (pesos enteros) y no REAL, para evitar errores de redondeo.
+    # La fecha es TEXT en formato AAAA-MM-DD: así se puede ordenar y comparar como texto.
     cursor.execute("""
         CREATE TABLE products (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,8 +94,8 @@ def create_db():
         )
     """)
 
-    # Parameterized query: each "?" is replaced by the values of each tuple.
-    # executemany runs the same INSERT once for every product in the list.
+    # Consulta parametrizada: cada "?" se reemplaza por los valores de cada tupla.
+    # executemany ejecuta el mismo INSERT una vez por cada producto de la lista.
     cursor.executemany(
         """
         INSERT INTO products (name, category, description, condition, final_price, date)
@@ -107,7 +106,7 @@ def create_db():
 
     connection.commit()
 
-    # Summary to check that everything was loaded correctly.
+    # Resumen para verificar que se cargó todo bien.
     print(f"Database created at: {DB_PATH}")
     cursor.execute("""
         SELECT category, COUNT(*), MIN(final_price), MAX(final_price)

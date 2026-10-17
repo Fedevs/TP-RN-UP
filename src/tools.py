@@ -4,9 +4,9 @@ from db import connect
 
 
 def search_similar(category, keywords):
-    """Returns the products of a category whose name contains at least one of the keywords.
+    """Devuelve los productos de una categoría cuyo nombre contiene al menos una de las keywords.
 
-    If keywords is empty, returns every product of the category.
+    Si keywords está vacía, devuelve todos los productos de la categoría.
     """
     query = "SELECT * FROM products WHERE category = ?"
     values = [category]
@@ -27,9 +27,9 @@ def search_similar(category, keywords):
 
 
 def price_stats(products):
-    """Returns the count, min, max and median of the products' final prices.
+    """Devuelve la cantidad, el mínimo, el máximo y la mediana de los precios finales.
 
-    Returns None if the list is empty.
+    Devuelve None si la lista está vacía.
     """
     if not products:
         return None

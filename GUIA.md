@@ -332,4 +332,5 @@ Anotar acá cada decisión importante y por qué (sirve para el informe y la def
 | 2026-10-16 | Gemini (Google GenAI) como LLM | Capa gratuita y buena integración con LangChain |
 | 2026-10-16 | SQLite como base de datos de productos | Viene con Python, no necesita servidor y permite consultas SQL |
 | 2026-10-16 | Código en inglés; documentación en español | Las librerías están en inglés y así no se mezclan idiomas en el código. Los datos de productos quedan en español (mercado argentino) |
+| 2026-10-17 | Comentarios y prompts del código en español | Los nombres siguen en inglés, pero los comentarios se leen más fácil en español para todo el grupo |
 | | | |
